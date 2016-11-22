@@ -1,0 +1,21 @@
+{
+	"manifest_version": 2,
+
+	 "name": "Contentstack Extension",
+  	"description": "A chrome extension for contentstack.built.io that allows the user to click on an element from a contentstack website and be taken to the latest revision of that element.",
+  	"version": "1.0",
+    "icons":{
+      "16": "img/badge16.png",
+      "32": "img/badge32.png",
+      "48": "img/badge48.png"
+      },
+    "browser_action": {
+        "name": "Click to get URL"
+      },
+    "background": {
+      "scripts": ["scripts/background.js"]
+    },
+    "permissions": [ "<all_urls>", "storage" ],
+
+  "web_accessible_resources":["img/*.svg", "css/styles.css"]
+}

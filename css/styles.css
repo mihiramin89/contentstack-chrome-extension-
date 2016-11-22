@@ -1,0 +1,7 @@
+#highlight {
+ position: absolute;
+background-color: rgba(0,0,0,0.5);
+ z-index: 1000000;
+    pointer-events:none;
+        
+}
