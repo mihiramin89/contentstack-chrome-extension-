@@ -1,5 +1,11 @@
 chrome.browserAction.onClicked.addListener(function (tab) { //Fired when User Clicks ICON
-    //if (tab.url.indexOf("https://www.google.co.in/") != -1) { // Inspect whether the place where user clicked matches with our list of URL
+    	chrome.browserAction.setIcon({
+		  path : {
+		    "19": "img/badge16.png",
+		    "38": "img/badge32.png",
+		    "48": "img/badge48.png"
+		  }, tabId: tab.id
+		});
     	chrome.tabs.insertCSS(tab.id,{
     		"file": "css/styles.css"
 	    	}, function() {
