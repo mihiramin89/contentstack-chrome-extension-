@@ -1,8 +1,12 @@
 var cur;
 
-var overlaydiv = document.createElement("div");
-overlaydiv.id = "highlight";
-document.body.appendChild(overlaydiv);
+var divExists = document.getElementById("highlight");
+if(divExists === null){
+    var overlaydiv = document.createElement("div");
+    overlaydiv.id = "highlight";
+    document.body.appendChild(overlaydiv);
+
+}
 
 var no = [document.body, document.documentElement, document];
 
@@ -20,15 +24,15 @@ document.body.addEventListener("mousemove", function(e) {
     }
 
     var target = e.target;
-    var offsetTop = target.offsetTop;
-    var offsetLeft = target.offsetLeft;
+    var offsetTop = target.getBoundingClientRect().top + window.pageYOffset;
+    var offsetLeft = target.getBoundingClientRect().left + window.pageXOffset;
     var width = target.clientWidth;
     var height = target.clientHeight;
 
     cur = e.target;
 
-    overlay.style.top = e.clientY + "px";
-    overlay.style.left = e.clientX + "px";
+    overlay.style.top = offsetTop + "px";
+    overlay.style.left = offsetLeft + "px";
     overlay.style.width = width + "px";
     overlay.style.height = height + "px";
 });
