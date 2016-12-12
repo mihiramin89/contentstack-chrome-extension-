@@ -1,13 +1,15 @@
-#contentsack-highlight,
-#contentstack-clickablediv {
+#contentsack-highlight {
     position: absolute;
     border: solid 2px #E54A4E;
     /*background-color: rgba(0, 0, 0, 0.5);*/
-    z-index: 1000000;
+    z-index: 1;
 }
 
 #contentstack-clickablediv {
     display: none;
+    z-index: 13;
+    /*background-color: rgba(0, 0, 0, 0.5);*/
+    position: absolute;
 }
 
 #contentstack-hoverBox {
@@ -16,7 +18,7 @@
     border-color: transparent;
     border-style: dashed dashed solid;
     position: absolute;
-    z-index: 1000002;
+    z-index: 10;
     height: 30px;
     -webkit-animation: gb__a .2s;
     animation: gb__a .2s;
@@ -29,13 +31,12 @@
     border-color: transparent transparent whitesmoke;
     border-style: dashed dashed solid;
     position: absolute;
-    z-index: 1000003;
+    z-index: 11;
     height: 0;
     width: 0;
     -webkit-animation: gb__a .2s;
     animation: gb__a 0.2s;
     border-width: 0 8px 8px;
     border-bottom-color: #E54A4E;
-    border-bottom-color-opacity: 0.2;
     display: none;
 }

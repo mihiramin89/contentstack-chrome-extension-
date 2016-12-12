@@ -16,18 +16,21 @@ function init() {
         document.body.appendChild(overlaydiv);
         var hoverDiv = document.createElement("div");
         hoverDiv.id = "contentstack-hoverBox";
+        hoverDiv.title = "click div to see information about the revision";
         var internalDiv = document.createElement("div");
         internalDiv.id = "contentstack-hoverBox-internal";
         overlaydiv.appendChild(internalDiv);
         overlaydiv.appendChild(hoverDiv);
         var clickablediv = document.createElement("div");
         clickablediv.id = "contentstack-clickablediv";
+        clickablediv.title = "click on div to jump to revision inside contentstack.built.io";
         document.body.appendChild(clickablediv);
         clickablediv.addEventListener('click', function() {
             openRevision(editURL);
         });
 
         overlaydiv.addEventListener('click', function showHover() {
+            var additionalPaddingAroundDiv = 20;
             if (hoverHTML !== null) {
                 hoverDiv.innerHTML = hoverHTML;
                 hoverDiv.style.display = 'block';
