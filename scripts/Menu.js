@@ -1,14 +1,34 @@
 var currentTab = null;
+var messageDiv = null;
+var timer = null;
 
 function doSomethingAfterwards(response) {
     if (response.success) {
         var form = document.getElementById("login_screen");
         form.style.display = 'none';
         document.getElementById("menu").style.display = "block";
+        showMessage('success', "success");
     } else {
+        showMessage('error', response.error);
         console.error(response.error);
     }
     showLogInAndOutLabel(response.success);
+}
+
+
+function showMessage(className, message) {
+    messageDiv.className = className;
+    messageDiv.innerText = message;
+    messageDiv.style.display = 'block';
+    timer = window.setTimeout(function() {
+        messageDiv.className = '';
+        clearTimeout(timer);
+        timer = null;
+    }, 3000);
+}
+
+function removeMessageClass(className) {
+
 }
 
 function logoutAccount() {
@@ -20,7 +40,9 @@ function logoutAccount() {
             loginDiv.id = "login-item";
             loginDiv.onclick = showLoginForm;
             console.log(response.message);
+            showMessage('success', response.message);
         } else {
+            showMessage('error', response.error);
             console.error(response.error);
         }
     });
@@ -54,7 +76,6 @@ function sendCredentials() {
 }
 
 function showLogInAndOutLabel(showLogout) {
-    console.log("show login or logout label");
     var login;
     if (showLogout) {
         loginDiv = document.getElementById("login-item");
@@ -93,6 +114,7 @@ function turnOn() {
         if (response.success) {
             document.getElementById("myonoffswitch").checked = true;
         } else {
+            showMessage('error', response.error);
             console.error(response.error);
         }
     });
@@ -108,18 +130,17 @@ function turnOff() {
         if (response.success) {
             document.getElementById("myonoffswitch").checked = false;
         } else {
+            showMessage('error', response.error);
             console.error(response.error);
         }
     });
 }
 
 function determineOnOffLabel(tabs) {
-    console.log("determine on/off label");
     if (tabs !== undefined && tabs !== null) {
         currentTab = tabs[0];
         chrome.storage.local.get("contentstackTabs", function(response) {
             if (response.contentstackTabs !== null && response.contentstackTabs !== undefined) {
-                console.log("current Tab: " + currentTab.url + "  -  " + response.contentstackTabs.url);
                 if (currentTab.url == response.contentstackTabs.url) {
                     document.getElementById("myonoffswitch").checked = response.contentstackTabs.enabled;
                 }
@@ -132,8 +153,9 @@ function init() {
     document.getElementById("login-item").onclick = showLoginForm;
     document.getElementById("myonoffswitch").onclick = checkValue;
     document.getElementById("myonoffswitch").checked = false; //default to be off. 
+    messageDiv = document.getElementById("message");
     chrome.storage.local.get("contentstackLoggedIn", function(response) {
-        console.log("is user logged in? " + response.contentstackLoggedIn);
+        // console.log("is user logged in? " + response.contentstackLoggedIn);
         var isUserLoggedIn = response.contentstackLoggedIn;
         showLogInAndOutLabel(isUserLoggedIn);
     });
