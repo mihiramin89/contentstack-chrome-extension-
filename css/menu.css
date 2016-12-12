@@ -1,0 +1,145 @@
+::selection {
+    background: #ffb7b7;
+    /* WebKit/Blink Browsers */
+}
+
+#login-item,
+#logout-item {
+    color: #E54A4E;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.userSession {
+    margin-bottom: 5px;
+}
+
+#login_screen {
+    color: #E54A4E;
+}
+
+.buttons {
+    margin: 5px;
+    display: inline;
+}
+
+button {
+    height: 25px;
+    color: white;
+    background-color: #E54A4E;
+    border: none;
+}
+
+button:focus {
+    outline-color: #E54;
+    outline-width: medium;
+}
+
+input[type='text'],
+input[type='password'] {
+    margin: 5px;
+    border: none;
+    border-bottom: solid thin #E54A4E;
+}
+
+input[type='text']:focus,
+input[type='password']:focus {
+    outline: none;
+}
+
+.onoffswitch {
+    position: relative;
+    width: 60px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.onoffswitch-checkbox {
+    display: none;
+}
+
+.onoffswitch-label {
+    display: block;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid #999999;
+    border-radius: 20px;
+}
+
+.onoffswitch-inner {
+    display: block;
+    width: 200%;
+    margin-left: -100%;
+    transition: margin 0.3s ease-in 0s;
+}
+
+.onoffswitch-inner:before,
+.onoffswitch-inner:after {
+    display: block;
+    float: left;
+    width: 50%;
+    height: 20px;
+    padding: 0;
+    line-height: 20px;
+    font-size: 11px;
+    color: white;
+    font-family: Trebuchet, Arial, sans-serif;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #E54A4E;
+    color: #FFFFFF;
+}
+
+.onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #EEEEEE;
+    color: #999999;
+    text-align: right;
+}
+
+.onoffswitch-switch {
+    display: block;
+    width: 9px;
+    margin: 6px;
+    background: #FFFFFF;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 33px;
+    border: 2px solid #999999;
+    border-radius: 20px;
+    transition: all 0.3s ease-in 0s;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+
+.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
+    right: 0px;
+}
+
+.error {
+    animation-duration: 3s;
+    animation-name: slidein;
+    content: "Error";
+}
+
+@keyframes slidein {
+    from {
+        margin-left: 100%;
+        width: 300%;
+    }
+    to {
+        margin-left: 0%;
+        width: 100%;
+    }
+}

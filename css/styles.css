@@ -1,12 +1,16 @@
-#highlight {
- position: absolute;
-background-color: rgba(0,0,0,0.5);
- z-index: 1000000;
-    pointer-events:none;
-        
+#contentsack-highlight,
+#contentstack-clickablediv {
+    position: absolute;
+    border: solid 2px #E54A4E;
+    /*background-color: rgba(0, 0, 0, 0.5);*/
+    z-index: 1000000;
 }
 
-.hoverBox {
+#contentstack-clickablediv {
+    display: none;
+}
+
+#contentstack-hoverBox {
     margin-top: 8px;
     left: auto;
     border-color: transparent;
@@ -18,17 +22,20 @@ background-color: rgba(0,0,0,0.5);
     animation: gb__a .2s;
     background-color: #E54A4E;
     color: white;
+    display: none;
 }
-.hoverBox-internal {
+
+#contentstack-hoverBox-internal {
     border-color: transparent transparent whitesmoke;
     border-style: dashed dashed solid;
     position: absolute;
-    z-index:1000003;
-    height:0;
-    width:0;
+    z-index: 1000003;
+    height: 0;
+    width: 0;
     -webkit-animation: gb__a .2s;
     animation: gb__a 0.2s;
     border-width: 0 8px 8px;
     border-bottom-color: #E54A4E;
     border-bottom-color-opacity: 0.2;
+    display: none;
 }
