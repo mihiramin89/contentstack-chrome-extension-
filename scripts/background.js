@@ -116,17 +116,22 @@ function getUserSession(username, password, sendResponse) {
     xhr.addEventListener("readystatechange", function() {
         if (this.readyState === 4) {
             var resp = JSON.parse(this.responseText);
-            console.log(resp.notice);
-            authToken = resp.user.authtoken;
-            console.log("successfully grabbed " + resp.user.email + "'s auth token: " + authToken);
-            if (resp.user.email) {
-                chrome.storage.local.set({ 'contentstackLoggedIn': true });
-                sendResponse({ "success": true });
-            } else {
+            if (resp.error_code) {
+                console.log(resp.error_message);
                 chrome.storage.local.set({ 'contentstackLoggedIn': false });
                 sendResponse({ "success": false, "error": "Invalid email/password" });
+            } else {
+                console.log(resp.notice);
+                authToken = resp.user.authtoken;
+                console.log("successfully grabbed " + resp.user.email + "'s auth token: " + authToken);
+                if (resp.user.email) {
+                    chrome.storage.local.set({ 'contentstackLoggedIn': true });
+                    sendResponse({ "success": true });
+                } else {
+                    chrome.storage.local.set({ 'contentstackLoggedIn': false });
+                    sendResponse({ "success": false, "error": "Invalid email/password" });
+                }
             }
-
         }
     });
 
