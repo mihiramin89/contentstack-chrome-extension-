@@ -80,7 +80,7 @@ function executeScript(file, tabid, consoleMessage) {
 }
 
 function disableExtension(tabid, sendResponse) {
-    chrome.tabs.reload(tabid);
+    //chrome.tabs.reload(tabid);
     chrome.browserAction.setIcon({
         path: {
             "19": "img/badgeDis16.png",
@@ -89,6 +89,10 @@ function disableExtension(tabid, sendResponse) {
         },
         tabId: tabid
     });
+    sendMessageToScript("background", "suspendScript", function() {
+        console.log("Disable: returned from sending suspendScript to script");
+    });
+
     chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": false } });
     sendResponse({ "success": true });
 }
@@ -119,17 +123,15 @@ function getUserSession(username, password, sendResponse) {
             if (resp.error_code) {
                 console.log(resp.error_message);
                 chrome.storage.local.set({ 'contentstackLoggedIn': false });
-                sendResponse({ "success": false, "error": "Invalid email/password" });
+                sendResponse({ "success": false, "error": "Oops: Invalid email/password." });
             } else {
-                console.log(resp.notice);
                 authToken = resp.user.authtoken;
-                console.log("successfully grabbed " + resp.user.email + "'s auth token: " + authToken);
                 if (resp.user.email) {
                     chrome.storage.local.set({ 'contentstackLoggedIn': true });
-                    sendResponse({ "success": true });
+                    sendResponse({ "success": true, "message": "Successfully logged!" });
                 } else {
                     chrome.storage.local.set({ 'contentstackLoggedIn': false });
-                    sendResponse({ "success": false, "error": "Invalid email/password" });
+                    sendResponse({ "success": false, "error": "Oops: Invalid email/password." });
                 }
             }
         }
@@ -158,6 +160,9 @@ function signoutUserSession(sendResponse) {
                     sendResponse({ "success": false, "error": resp.error_message });
                 }
                 chrome.storage.local.set({ 'contentstackLoggedIn': false });
+                sendMessageToScript("background", "suspendScript", function() {
+                    console.log("Logout: returned from sending suspendScript to script");
+                });
             }
         });
         xhr.open("DELETE", "https://api.contentstack.io/v3/user-session", false);
@@ -170,3 +175,23 @@ function signoutUserSession(sendResponse) {
     }
 
 }
+
+function sendMessageToScript(source, actionToExecute, callbackFunction) {
+
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { from: source, action: actionToExecute }, function() {
+            callbackFunction();
+        });
+    });
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.url === undefined && tab.url === currentURL) {
+        //TODO: bug with infinite loop of refreshing.. need to figure out a way to remove script without reloading page.
+        disableExtension(tabId, function() {});
+        //need to sign out user and update localstore variables.
+        chrome.storage.local.set({ 'contentstackLoggedIn': false });
+        console.log("refreshing tabs");
+
+    }
+});

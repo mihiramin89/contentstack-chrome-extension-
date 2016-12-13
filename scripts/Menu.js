@@ -7,7 +7,7 @@ function doSomethingAfterwards(response) {
         var form = document.getElementById("login_screen");
         form.style.display = 'none';
         document.getElementById("menu").style.display = "block";
-        showMessage('success', "success");
+        showMessage('success', response.message);
     } else {
         showMessage('error', response.error);
         console.error(response.error);
@@ -40,6 +40,8 @@ function logoutAccount() {
             loginDiv.id = "login-item";
             loginDiv.onclick = showLoginForm;
             console.log(response.message);
+            turnOff();
+            document.getElementById("myonoffswitch").disabled = true;
             showMessage('success', response.message);
         } else {
             showMessage('error', response.error);
@@ -157,7 +159,7 @@ function init() {
     document.getElementById("myonoffswitch").checked = false; //default to be off. 
     messageDiv = document.getElementById("message");
     chrome.storage.local.get("contentstackLoggedIn", function(response) {
-        // console.log("is user logged in? " + response.contentstackLoggedIn);
+        console.log("is user logged in? " + response.contentstackLoggedIn);
         var isUserLoggedIn = response.contentstackLoggedIn;
         showLogInAndOutLabel(isUserLoggedIn);
     });

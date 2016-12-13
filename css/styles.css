@@ -1,42 +1,106 @@
-#contentsack-highlight {
+#contentstack-highlight {
     position: absolute;
     border: solid 2px #E54A4E;
     /*background-color: rgba(0, 0, 0, 0.5);*/
     z-index: 1;
 }
 
-#contentstack-clickablediv {
-    display: none;
-    z-index: 13;
-    /*background-color: rgba(0, 0, 0, 0.5);*/
-    position: absolute;
-}
-
 #contentstack-hoverBox {
-    margin-top: 8px;
+    margin-top: 3px;
     left: auto;
-    border-color: transparent;
-    border-style: dashed dashed solid;
+    border: solid 1px #E54A4E;
+    box-shadow: 5px 5px 12px #aaaaaa;
     position: absolute;
     z-index: 10;
-    height: 30px;
+    height: 100px;
+    /*animation: fadein 10s ease-in;*/
     -webkit-animation: gb__a .2s;
     animation: gb__a .2s;
-    background-color: #E54A4E;
-    color: white;
+    background-color: white;
+    color: #E54A4E;
     display: none;
+    opacity: 0px;
 }
 
-#contentstack-hoverBox-internal {
-    border-color: transparent transparent whitesmoke;
-    border-style: dashed dashed solid;
-    position: absolute;
-    z-index: 11;
-    height: 0;
-    width: 0;
-    -webkit-animation: gb__a .2s;
-    animation: gb__a 0.2s;
-    border-width: 0 8px 8px;
-    border-bottom-color: #E54A4E;
+#contentstack-hoverbox-icons {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.hoverButtons {
+    display: inline;
+    margin-top: 0;
+    height: 43px;
+    width: 43px;
+    border: none;
+    cursor: pointer;
+}
+
+#contentstack-entryInfo {
+    font-size: 15px;
+    line-height: normal;
+    padding: 10px;
+    padding-bottom: 3px;
+}
+
+.spacer {
+    padding: 0 8px;
+}
+
+@keyframes fadein {
+    0% {
+        opacity: 0;
+        display: none;
+    }
+    90% {
+        opacity: 1;
+        transform: translateY(0px);
+        display: block;
+    }
+}
+
+#contentstack-message {
     display: none;
+    opacity: 0;
+    position: absolute;
+    z-index: 10;
+    width: 34%;
+    float: left;
+    top: 0;
+    left: 0;
+    padding: 0 34%;
+}
+
+.error {
+    display: block;
+    animation: messagefadein 3s linear forwards;
+    color: whitesmoke;
+    background-color: #AF2B2B;
+}
+
+.success {
+    display: block;
+    animation: messagefadein 3s linear forwards;
+    color: whitesmoke;
+    background-color: #0FA862;
+}
+
+@keyframes messagefadein {
+    0% {
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+    99% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 0;
+    }
 }

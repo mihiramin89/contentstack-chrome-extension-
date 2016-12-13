@@ -4,53 +4,74 @@ var authToken = null;
 var stackData = [];
 var editURL = null;
 var hoverHTML = null;
+var isInspectionSuspended = false;
 init();
 
 function init() {
     authToken = null;
     stackData = [];
-    var divExists = document.getElementById("contentsack-highlight");
+    var divExists = document.getElementById("contentstack-highlight");
     if (divExists === null) {
         var overlaydiv = document.createElement("div");
-        overlaydiv.id = "contentsack-highlight";
+        overlaydiv.id = "contentstack-highlight";
         document.body.appendChild(overlaydiv);
+
         var hoverDiv = document.createElement("div");
         hoverDiv.id = "contentstack-hoverBox";
         hoverDiv.title = "click div to see information about the revision";
-        var internalDiv = document.createElement("div");
-        internalDiv.id = "contentstack-hoverBox-internal";
-        overlaydiv.appendChild(internalDiv);
         overlaydiv.appendChild(hoverDiv);
-        var clickablediv = document.createElement("div");
-        clickablediv.id = "contentstack-clickablediv";
-        clickablediv.title = "click on div to jump to revision inside contentstack.built.io";
-        document.body.appendChild(clickablediv);
-        clickablediv.addEventListener('click', function() {
+
+        var hoverbuttons = document.createElement("div");
+        hoverbuttons.id = "contentstack-hoverbox-icons";
+        var closeImg = document.createElement("img");
+        closeImg.className = "hoverButtons";
+        closeImg.src = chrome.extension.getURL("/img/Close.svg");
+        closeImg.addEventListener('click', function(event) {
+            event.stopPropagation();
+            closeHoverBox();
+        });
+        var goToImg = document.createElement("img");
+        goToImg.className = "hoverButtons";
+        goToImg.src = chrome.extension.getURL("/img/GoToArrow.svg");
+        goToImg.title = "click on div to jump to revision inside contentstack.built.io";
+        goToImg.addEventListener('click', function() {
+            event.stopPropagation();
             openRevision(editURL);
         });
+        var spacerDiv = document.createElement('span');
+        spacerDiv.className = "spacer";
+        hoverbuttons.appendChild(closeImg);
+        hoverbuttons.appendChild(spacerDiv);
+        hoverbuttons.appendChild(goToImg);
+        hoverDiv.appendChild(hoverbuttons);
+
 
         overlaydiv.addEventListener('click', function showHover() {
-            var additionalPaddingAroundDiv = 20;
             if (hoverHTML !== null) {
-                hoverDiv.innerHTML = hoverHTML;
+                suspendInspection();
+                hoverDiv.insertBefore(hoverHTML, hoverbuttons);
+                hoverDiv.style.animationName = "fadein"
+                hoverDiv.style.animationDuration = "0.2s";
+                hoverDiv.style.animationDirection = "ease-in";
                 hoverDiv.style.display = 'block';
-                hoverDiv.style.height = '100px';
-                internalDiv.style.display = 'block';
-                //move clickable div overtop the overlay.
-                clickablediv.style.left = overlaydiv.style.left;
-                clickablediv.style.top = overlaydiv.style.top;
-                clickablediv.style.height = overlaydiv.style.height;
-                clickablediv.style.width = overlaydiv.style.width;
-                clickablediv.style.display = 'block';
+
+                hoverDiv.style.top = overlaydiv.offsetHeight - 5 + "px";
+                hoverDiv.style.left = (overlaydiv.offsetWidth / 4) + "px";
+
+                //set button location:
+                hoverbuttons.style.top = hoverDiv.style.top + hoverDiv.style.height + "px";
             }
         });
+
+        var messageDiv = document.createElement('div');
+        messageDiv.id = "contentstack-message";
+        document.body.appendChild(messageDiv);
 
     }
 
     chrome.runtime.sendMessage({ from: "script", action: "grabAuth" }, function(response) {
         if (response.success) {
             authToken = response.token;
-            console.log("successful transmission");
             document.body.onmousemove = startInspection;
 
             var headerInfo = [];
@@ -62,59 +83,104 @@ function init() {
             sendRequest(headerInfo, request, true, stackCallback);
 
         }
-    })
-}
-//document.body.addEventListener("mousemove", function(e){
-function startInspection(e) {
-    var overlay = document.getElementById("contentsack-highlight");
-    var hoverBox = document.getElementById("contentstack-hoverBox");
-    if (e.target === cur) {
-        return;
-    }
+    });
 
-    if (~no.indexOf(e.target)) {
-        cur = null;
-        overlay.style.display = 'none';
-        hoverBox.style.display = 'none';
-        return;
-    }
 
-    cur = e.target;
-
-    overlay.style.top = (cur.getBoundingClientRect().top + window.pageYOffset) + "px";
-    overlay.style.left = (cur.getBoundingClientRect().left + window.pageXOffset) + "px";
-    overlay.style.width = (cur.clientWidth) + "px";
-    overlay.style.height = (cur.clientHeight) + "px";
-
-    var entry_id;
-    entry_id = findEntryID(cur);
-    overlay.style.display = 'block';
-
-    //set header information.
-    if (stackData.current_stack && entry_id.contentTypeID && entry_id.entryId) {
-        var headerInfo = [];
-        headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
-        headerInfo.push({ 'key': 'api_key', 'value': stackData.current_stack.api_key });
-        headerInfo.push({ 'key': 'authtoken', 'value': authToken });
-
-        // request = 'https://api.contentstack.io/v3/content_types/'+entry_id.contentTypeID+'/entries/'+entry_id.entryId;
-        request = 'https://api.contentstack.io/v3/content_types/' + entry_id.contentTypeID + '/entries/' + entry_id.entryId;
-        sendRequest(headerInfo, request, false, function(response) {
-            console.log("returned from entry id call");
-            var entry = response.entry;
-            if (entry !== null && entry !== undefined) {
-                var version = response.entry._version;
-                var updatedBy = response.entry.updated_by;
-                var updatedAt = response.entry.updated_at;
-                console.log("version: " + version + " updatedBy: " + updatedBy + " updatedAt: " + updatedAt);
-                setHoverEffect(response);
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        console.log("receiving message from background");
+        if (message.from && message.from === "background") {
+            switch (message.action) {
+                case "suspendScript":
+                    console.log("suspending script");
+                    suspendInspection();
+                    break;
             }
+        }
+    });
+}
 
-        });
-        console.log('stackCallback: set inner html');
-    } else {
-        console.log("cannot grab stack information or entry id.");
+function closeHoverBox() {
+    var hoverBox = document.getElementById("contentstack-hoverBox");
+    hoverBox.style.display = 'none';
+    document.getElementById("contentstack-entryInfo").remove();
+    isInspectionSuspended = false;
+
+}
+
+function suspendInspection() {
+    if (document.getElementById("contentstack-entryInfo") !== null) {
+        closeHoverBox(); //call just to make sure hover box is closed.
     }
+    var overlay = document.getElementById("contentstack-highlight");
+    if (overlay !== null) {
+        overlay.style.display = 'none';
+    }
+    isInspectionSuspended = true;
+}
+
+function startInspection(e) {
+    if (!isInspectionSuspended && authToken) {
+        var overlay = document.getElementById("contentstack-highlight");
+        var hoverBox = document.getElementById("contentstack-hoverBox");
+        if (e.target === cur) {
+            return;
+        }
+
+        if (~no.indexOf(e.target)) {
+            cur = null;
+            overlay.style.display = 'none';
+            hoverBox.style.display = 'none';
+            return;
+        }
+
+        cur = e.target;
+
+        overlay.style.top = (cur.getBoundingClientRect().top + window.pageYOffset) + "px";
+        overlay.style.left = (cur.getBoundingClientRect().left + window.pageXOffset) + "px";
+        overlay.style.width = (cur.clientWidth) + "px";
+        overlay.style.height = (cur.clientHeight) + "px";
+
+        var entry_id;
+        entry_id = findEntryID(cur);
+        overlay.style.display = 'block';
+
+        //set header information.
+        if (stackData.current_stack && entry_id.contentTypeID && entry_id.entryId) {
+            var headerInfo = [];
+            headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
+            headerInfo.push({ 'key': 'api_key', 'value': stackData.current_stack.api_key });
+            headerInfo.push({ 'key': 'authtoken', 'value': authToken });
+
+            // request = 'https://api.contentstack.io/v3/content_types/'+entry_id.contentTypeID+'/entries/'+entry_id.entryId;
+            request = 'https://api.contentstack.io/v3/content_types/' + entry_id.contentTypeID + '/entries/' + entry_id.entryId;
+            sendRequest(headerInfo, request, false, function(response) {
+                var entry = response.entry;
+                if (entry !== null && entry !== undefined) {
+                    var version = response.entry._version;
+                    var updatedBy = response.entry.updated_by;
+                    var updatedAt = response.entry.updated_at;
+                    setHoverEffect(response);
+                }
+
+            });
+        } else {
+            console.error("cannot grab stack information or entry id.");
+            showMessage("error", "cannot grab stack information or entry id.");
+
+        }
+    }
+}
+
+function showMessage(className, message) {
+    var messageDiv = document.getElementById("contentstack-message");
+    messageDiv.className = className;
+    messageDiv.innerText = message;
+    messageDiv.style.display = 'block';
+    timer = window.setTimeout(function() {
+        messageDiv.className = '';
+        clearTimeout(timer);
+        timer = null;
+    }, 3000);
 }
 
 function sendRequest(headerInfo, request, synchronous, onreadyStateChangeCallback) {
@@ -206,6 +272,7 @@ function grabCollaborators(collaborators) {
 function setHoverEffect(response) {
     var index = stackData.current_stack.index;
     var updatedbyID = response.entry.updated_by;
+    var updatedAt = new Date(response.entry.updated_at);
     var email;
 
     editURL = 'https://contentstack.built.io/#!/stack/' + stackData.current_stack.api_key + '/content-type/' + 'home' + '/en-us/entry/' + response.entry.uid + '/edit';
@@ -218,7 +285,10 @@ function setHoverEffect(response) {
         }
     }
 
-    hoverHTML = '<span>Version: ' + response.entry._version + ' | Updated By: ' + email + ' | Updated At: ' + response.entry.updated_at + '</span>';
+    hoverHTML = document.createElement('div');
+    hoverHTML.id = "contentstack-entryInfo";
+    var innerText = '<span>Version: ' + response.entry._version + '</span><br /><span> Updated By: ' + email + ' </span><br /><span> Updated At: ' + updatedAt + '</span>';
+    hoverHTML.innerHTML = innerText;
 }
 
 function openRevision(editURL) {
