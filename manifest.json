@@ -1,24 +1,27 @@
 {
-	"manifest_version": 2,
+    "manifest_version": 2,
 
-	 "name": "Contentstack Extension",
-  	"description": "A chrome extension for contentstack.built.io that allows the user to click on an element from a contentstack website and be taken to the latest revision of that element.",
-  	"version": "1.0",
+    "name": "Contentstack Extension",
+    "description": "A chrome extension for contentstack.built.io that allows the user to click on an element from a contentstack website and be taken to the latest revision of that element.",
+    "version": "1.0",
+    "author": "Mihir Amin",
+    "default_locale": "en",
     "browser_action": {
-        "default_icon":{
-          "16": "img/badgeDis16.png",
-          "32": "img/badgeDis32.png",
-          "48": "img/badgeDis48.png"
+        "default_icon": {
+            "16": "img/badgeDis16.png",
+            "32": "img/badgeDis32.png",
+            "48": "img/badgeDis48.png"
         },
         "default_title": "Click to login contentstack",
         "name": "Contentstack"
-      },
-    "background": {
-      "scripts": [
-        "scripts/background.js"],
-      "persistent": false
     },
-    "permissions": [ "activeTab", "tabs", "storage" ],
+    "background": {
+        "scripts": [
+            "scripts/background.js"
+        ],
+        "persistent": false
+    },
+    "permissions": ["activeTab", "tabs", "storage"],
 
-  "web_accessible_resources":["img/*.svg", "css/styles.css"]
+    "web_accessible_resources": ["img/*.svg", "css/styles.css"]
 }
