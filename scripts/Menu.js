@@ -83,6 +83,7 @@ function showLogInAndOutLabel(showLogout) {
             loginDiv.innerHTML = "Logout";
             loginDiv.id = "logout-item";
             loginDiv.onclick = logoutAccount;
+            document.getElementById("myonoffswitch").disabled = false;
         }
     } else {
         loginDiv = document.getElementById("logout-item");
@@ -90,6 +91,7 @@ function showLogInAndOutLabel(showLogout) {
             loginDiv.innerHTML = "Login";
             loginDiv.id = "login-item";
             loginDiv.onclick = showLoginForm;
+            document.getElementById("myonoffswitch").disabled = true;
         }
 
     }

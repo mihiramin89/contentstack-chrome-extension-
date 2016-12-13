@@ -5,7 +5,6 @@
     "description": "A chrome extension for contentstack.built.io that allows the user to click on an element from a contentstack website and be taken to the latest revision of that element.",
     "version": "1.0",
     "author": "Mihir Amin",
-    "default_locale": "en",
     "browser_action": {
         "default_icon": {
             "16": "img/badgeDis16.png",
