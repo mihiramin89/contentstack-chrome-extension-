@@ -10,7 +10,7 @@ In order to get your contentstack to work with the google chrome extension, some
 3. Modify all index.html files inside the themes/basic/templates/pages
 4. add the following attributes to the section tags inside the index.html files. 
 
-     <section data-content-type-id="{{content_type}}" data-entry-id="{{entry.uid}}">...</section>
+     data-content-type-id="{{content_type}}" data-entry-id="{{entry.uid}}"
 
     
 5. Save and launch the local repo and you should be all set.
