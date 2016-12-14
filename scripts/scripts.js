@@ -48,7 +48,7 @@ function init() {
 
         overlaydiv.addEventListener('click', function showHover() {
             if (hoverHTML !== null) {
-                suspendInspection();
+                isInspectionSuspended = true;
                 hoverDiv.insertBefore(hoverHTML, hoverbuttons);
                 hoverDiv.style.animationName = "fadein"
                 hoverDiv.style.animationDuration = "0.2s";
@@ -126,7 +126,7 @@ function startInspection(e) {
             return;
         }
 
-        if (~no.indexOf(e.target)) {
+        if (~no.indexOf(e.target) || e.target.id === "contentstack-message" || e.target.id === "contentstack-highlight") {
             cur = null;
             overlay.style.display = 'none';
             hoverBox.style.display = 'none';
@@ -142,7 +142,6 @@ function startInspection(e) {
 
         var entry_id;
         entry_id = findEntryID(cur);
-        overlay.style.display = 'block';
 
         //set header information.
         if (stackData.current_stack && entry_id.contentTypeID && entry_id.entryId) {
@@ -163,10 +162,10 @@ function startInspection(e) {
                 }
 
             });
+            overlay.style.display = 'block';
         } else {
-            console.error("cannot grab stack information or entry id.");
-            showMessage("error", "cannot grab stack information or entry id.");
-
+            console.error("Cannot grab information or not supported by contentstack.");
+            showMessage("error", "Not a Contentstack generated DOM element or Contentstack website does not support extension. See https://github.com/mihiramin89/contentstack-element-revision-chrome-extension for more information.");
         }
     }
 }
