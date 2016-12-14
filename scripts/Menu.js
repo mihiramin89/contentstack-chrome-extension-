@@ -33,6 +33,7 @@ function removeMessageClass(className) {
 
 function logoutAccount() {
     console.log("logging out...");
+    turnOff();
     chrome.runtime.sendMessage({ from: "menu", action: "logout" }, function(response) {
         if (response.success) {
             var loginDiv = document.getElementById("logout-item");
@@ -40,7 +41,6 @@ function logoutAccount() {
             loginDiv.id = "login-item";
             loginDiv.onclick = showLoginForm;
             console.log(response.message);
-            turnOff();
             document.getElementById("myonoffswitch").disabled = true;
             showMessage('success', response.message);
         } else {

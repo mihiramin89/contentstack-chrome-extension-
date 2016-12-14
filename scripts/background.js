@@ -13,14 +13,14 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 if (authToken) {
                     enableExtension(message.tabID, sendResponse);
                 } else {
-                    sendResponse({ "success": false, "error": "User not logged in." });
+                    sendResponse({ "success": false, "error": "Enable: User not logged in." });
                 }
                 break;
             case "disable":
                 if (authToken) {
                     disableExtension(message.tabID, sendResponse);
                 } else {
-                    sendResponse({ "success": false, "error": "User not logged in." });
+                    sendResponse({ "success": false, "error": "Disable: User not logged in." });
                 }
                 break;
         }
