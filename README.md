@@ -18,7 +18,8 @@ In order to get your contentstack to work with the google chrome extension, some
 
 # How to use the extension
 Once the setup steps are completed, the only remaining step is to load the extension. Below is a sample workflow for using the extension. 
-NOTE: Contenstack.built.io & contentstack api calls work independently of each other. Currently there is no way for both to communicate with each other, so there is an additional step required to use this extension. The user needs to manually go to the contentstack.built.io website and log in there, in addition to logging into the contentstack via the extension. If an API becomes available, this issue will be addressed.
+
+<strong>NOTE:</strong> Contenstack.built.io & contentstack api calls work independently of each other. Currently there is no way for both to communicate with each other, so there is an additional step required to use this extension. Issue is documented as <a href="https://github.com/mihiramin89/contentstack-element-revision-chrome-extension/issues/2" >Issue #2</a>
 
 1. Navigate to contentstack.built.io and login (this step needs to be done due to the note mentioned above). This will have to be done every time your contentstack session expires.
 2. Navigate to your contentstack published website
