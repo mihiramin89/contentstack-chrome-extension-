@@ -4,14 +4,12 @@
       .cls-1 {
         fill: #0fa862;
         stroke: #0fa862;
-      }
-
-      .cls-1, .cls-2, .cls-3, .cls-4 {
         stroke-width: 1px;
       }
 
       .cls-2, .cls-3, .cls-4 {
         fill: none;
+        stroke-width: 2px;
       }
 
       .cls-2 {
@@ -37,9 +35,9 @@
     <g id="Group_57" data-name="Group 57" transform="translate(1 -1)">
       <g id="Goto_Box_Arrow" data-name="Goto Box &amp; Arrow" transform="translate(1840 -4829)">
         <g id="Group_56" data-name="Group 56" transform="translate(0 3)">
-          <line id="Line_4" data-name="Line 4" class="cls-2" y2="29" transform="translate(775 540) rotate(90)"/>
-          <line id="Line_5" data-name="Line 5" class="cls-3" y2="12" transform="translate(774.5 528.5)"/>
-          <path id="Path_5" data-name="Path 5" class="cls-4" d="M0,0V12" transform="translate(758.5 512) rotate(90)"/>
+          <line id="Line_4" data-name="Line 4" class="cls-2" y2="29" transform="translate(775 539.5) rotate(90)"/>
+          <line id="Line_5" data-name="Line 5" class="cls-3" y2="12" transform="translate(774 528.5)"/>
+          <path id="Path_5" data-name="Path 5" class="cls-4" d="M0,0V12" transform="translate(757.5 512) rotate(90)"/>
           <line id="Line_6" data-name="Line 6" class="cls-4" y2="29" transform="translate(746.5 511.5)"/>
         </g>
       </g>

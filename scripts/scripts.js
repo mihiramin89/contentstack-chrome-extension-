@@ -119,6 +119,13 @@ function suspendInspection() {
 }
 
 function startInspection(e) {
+    if (e.target.clientWidth === 0 && e.target.clientHeight === 0) {
+        return;
+    }
+    if (e.target.id === "contentstack-highlight") {
+        return;
+    }
+
     if (!isInspectionSuspended && authToken) {
         var overlay = document.getElementById("contentstack-highlight");
         var hoverBox = document.getElementById("contentstack-hoverBox");
@@ -126,7 +133,7 @@ function startInspection(e) {
             return;
         }
 
-        if (~no.indexOf(e.target) || e.target.id === "contentstack-message" || e.target.id === "contentstack-highlight") {
+        if (~no.indexOf(e.target) || e.target.id === "contentstack-message") {
             cur = null;
             overlay.style.display = 'none';
             hoverBox.style.display = 'none';
