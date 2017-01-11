@@ -72,6 +72,9 @@ function enableExtension(tabid, sendResponse) {
         console.log("injecting CSS styles");
     });
     executeScript("scripts/jquery-3.1.1.min.js", tabid, "Injected jquery file ... ");
+    executeScript("scripts/global-variables.js", tabid, "Injected global variables ... ");
+    executeScript("scripts/ui-elements.js", tabid, "Injected ui-elements ... ");
+    executeScript("scripts/data-processor.js", tabid, "Injected data processing ... ");
     executeScript("scripts/scripts.js", tabid, "Script Executed ... ");
 
     updateTabArray(currentURL, true);
