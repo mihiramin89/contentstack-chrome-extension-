@@ -27,10 +27,6 @@ function showMessage(className, message) {
     }, 3000);
 }
 
-function removeMessageClass(className) {
-
-}
-
 function logoutAccount() {
     console.log("logging out...");
     turnOff();
@@ -169,5 +165,4 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', function() {
     init();
-
 });

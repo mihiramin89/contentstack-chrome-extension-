@@ -2,66 +2,79 @@ var cur;
 var no = [document.body, document.documentElement, document];
 var authToken = null;
 var stackData = [];
+var storedAllStacks = false;
 var editURL = null;
 var hoverHTML = null;
+var timer = null;
+var stacktimer = null;
 var isInspectionSuspended = false;
 init();
+
+function generateHTMLDivs() {
+    var overlaydiv = document.createElement("div");
+    overlaydiv.id = "contentstack-highlight";
+    document.body.appendChild(overlaydiv);
+
+    var hoverDiv = document.createElement("div");
+    hoverDiv.id = "contentstack-hoverBox";
+    hoverDiv.title = "click div to see information about the revision";
+    overlaydiv.appendChild(hoverDiv);
+
+    var hoverbuttons = document.createElement("div");
+    hoverbuttons.id = "contentstack-hoverbox-icons";
+
+    var spacerDiv = document.createElement('span');
+    spacerDiv.className = "spacer";
+
+    var closeDiv = addImgButton("/img/Close.svg", "close hoverbox", closeHoverBox);
+    hoverbuttons.appendChild(closeDiv);
+    hoverbuttons.appendChild(spacerDiv);
+    var gotoDiv = addImgButton("/img/GoToArrow.svg", "click on div to jump to revision inside contentstack.built.io", openRevision);
+    hoverbuttons.appendChild(gotoDiv);
+    hoverDiv.appendChild(hoverbuttons);
+
+    overlaydiv.addEventListener('click', function() {
+        //ISSUE: hoverHTML not flushed out until after the click. maybe delay the hover box?
+        showHover(hoverDiv, hoverbuttons, this);
+    });
+}
+
+function showHover(parent, childNode, overlay) {
+    if (hoverHTML !== null) {
+        isInspectionSuspended = true;
+        parent.insertBefore(hoverHTML, childNode);
+        parent.style.animationName = "fadein"
+        parent.style.animationDuration = "0.2s";
+        parent.style.animationDirection = "ease-in";
+        parent.style.display = 'block';
+
+        parent.style.top = overlay.offsetHeight - 5 + "px";
+        parent.style.left = (overlay.offsetWidth / 4) + "px";
+
+        //set button location:
+        childNode.style.top = parent.style.top + parent.style.height + "px";
+    }
+}
+
+function addImgButton(url, title, onclick) {
+    var imgDiv = document.createElement("img");
+    imgDiv.className = "hoverButtons";
+    imgDiv.src = chrome.extension.getURL(url);
+    imgDiv.title = title;
+    imgDiv.addEventListener('click', function() {
+        event.stopPropagation();
+        onclick();
+    });
+    return imgDiv;
+}
 
 function init() {
     authToken = null;
     stackData = [];
+    storedAllStacks = false;
     var divExists = document.getElementById("contentstack-highlight");
     if (divExists === null) {
-        var overlaydiv = document.createElement("div");
-        overlaydiv.id = "contentstack-highlight";
-        document.body.appendChild(overlaydiv);
-
-        var hoverDiv = document.createElement("div");
-        hoverDiv.id = "contentstack-hoverBox";
-        hoverDiv.title = "click div to see information about the revision";
-        overlaydiv.appendChild(hoverDiv);
-
-        var hoverbuttons = document.createElement("div");
-        hoverbuttons.id = "contentstack-hoverbox-icons";
-        var closeImg = document.createElement("img");
-        closeImg.className = "hoverButtons";
-        closeImg.src = chrome.extension.getURL("/img/Close.svg");
-        closeImg.addEventListener('click', function(event) {
-            event.stopPropagation();
-            closeHoverBox();
-        });
-        var goToImg = document.createElement("img");
-        goToImg.className = "hoverButtons";
-        goToImg.src = chrome.extension.getURL("/img/GoToArrow.svg");
-        goToImg.title = "click on div to jump to revision inside contentstack.built.io";
-        goToImg.addEventListener('click', function() {
-            event.stopPropagation();
-            openRevision(editURL);
-        });
-        var spacerDiv = document.createElement('span');
-        spacerDiv.className = "spacer";
-        hoverbuttons.appendChild(closeImg);
-        hoverbuttons.appendChild(spacerDiv);
-        hoverbuttons.appendChild(goToImg);
-        hoverDiv.appendChild(hoverbuttons);
-
-
-        overlaydiv.addEventListener('click', function showHover() {
-            if (hoverHTML !== null) {
-                isInspectionSuspended = true;
-                hoverDiv.insertBefore(hoverHTML, hoverbuttons);
-                hoverDiv.style.animationName = "fadein"
-                hoverDiv.style.animationDuration = "0.2s";
-                hoverDiv.style.animationDirection = "ease-in";
-                hoverDiv.style.display = 'block';
-
-                hoverDiv.style.top = overlaydiv.offsetHeight - 5 + "px";
-                hoverDiv.style.left = (overlaydiv.offsetWidth / 4) + "px";
-
-                //set button location:
-                hoverbuttons.style.top = hoverDiv.style.top + hoverDiv.style.height + "px";
-            }
-        });
+        generateHTMLDivs();
 
         var messageDiv = document.createElement('div');
         messageDiv.id = "contentstack-message";
@@ -109,7 +122,7 @@ function closeHoverBox() {
 
 function suspendInspection() {
     if (document.getElementById("contentstack-entryInfo") !== null) {
-        closeHoverBox(); //call just to make sure hover box is closed.
+        closeHoverBox(arg); //call just to make sure hover box is closed.
     }
     var overlay = document.getElementById("contentstack-highlight");
     if (overlay !== null) {
@@ -140,18 +153,23 @@ function startInspection(e) {
             return;
         }
 
+        if (!storedAllStacks) {
+            return; //still gathering stack data. do nothing.
+        }
         cur = e.target;
-
-        overlay.style.top = (cur.getBoundingClientRect().top + window.pageYOffset) + "px";
-        overlay.style.left = (cur.getBoundingClientRect().left + window.pageXOffset) + "px";
-        overlay.style.width = (cur.clientWidth) + "px";
-        overlay.style.height = (cur.clientHeight) + "px";
 
         var entry_id;
         entry_id = findEntryID(cur);
 
         //set header information.
         if (stackData.current_stack && entry_id.contentTypeID && entry_id.entryId) {
+
+            //only set hoverbox if we are in contentstack part of site.
+            overlay.style.top = (cur.getBoundingClientRect().top + window.pageYOffset) + "px";
+            overlay.style.left = (cur.getBoundingClientRect().left + window.pageXOffset) + "px";
+            overlay.style.width = (cur.clientWidth) + "px";
+            overlay.style.height = (cur.clientHeight) + "px";
+
             var headerInfo = [];
             headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
             headerInfo.push({ 'key': 'api_key', 'value': stackData.current_stack.api_key });
@@ -159,20 +177,21 @@ function startInspection(e) {
 
             // request = 'https://api.contentstack.io/v3/content_types/'+entry_id.contentTypeID+'/entries/'+entry_id.entryId;
             request = 'https://api.contentstack.io/v3/content_types/' + entry_id.contentTypeID + '/entries/' + entry_id.entryId;
-            sendRequest(headerInfo, request, false, function(response) {
+
+            //TODO: make asynchronous.
+            sendRequest(headerInfo, request, true, function(response) {
                 var entry = response.entry;
                 if (entry !== null && entry !== undefined) {
                     var version = response.entry._version;
                     var updatedBy = response.entry.updated_by;
                     var updatedAt = response.entry.updated_at;
                     setHoverEffect(response);
+                    overlay.style.display = 'block';
                 }
-
             });
-            overlay.style.display = 'block';
         } else {
             console.error("Cannot grab information or not supported by contentstack.");
-            showMessage("error", "Not a Contentstack generated DOM element or Contentstack website does not support extension. See https://github.com/mihiramin89/contentstack-element-revision-chrome-extension for more information.");
+            //showMessage("error", "Not a Contentstack generated DOM element or Contentstack website does not support extension. See https://github.com/mihiramin89/contentstack-element-revision-chrome-extension for more information.");
         }
     }
 }
@@ -190,7 +209,7 @@ function showMessage(className, message) {
 }
 
 function sendRequest(headerInfo, request, synchronous, onreadyStateChangeCallback) {
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open("GET", request, synchronous);
     xhr.onreadystatechange = (function() {
         if (xhr.readyState == 4) {
@@ -209,11 +228,42 @@ function stackCallback(response) {
 
     stacks.forEach(function(stack) {
         var collaborators = grabCollaborators(stack.collaborators);
-        grabEnvironments(stack, stackData, collaborators);
+        grabEnvironments(stack, collaborators);
+        //console.log("DEBUG: grabbing environments for stack " + stack.name);
     });
 
-    var current_stack_info = getCurrentStackKey(stackData);
-    stackData["current_stack"] = current_stack_info.current_stack;
+    //TODO: create timer to wait to execute this code until stackData.length = response.stack.length
+    // want to have all stacks so we can find current stack. 
+    stacktimer = window.setInterval(function() {
+        if (stackData.length === response.stacks.length) {
+            var current_stack_info = getCurrentStackKey(stackData);
+            stackData["current_stack"] = current_stack_info.current_stack;
+            clearTimeout(stacktimer);
+            stacktimer = null;
+            storedAllStacks = true;
+        }
+    }, 300);
+
+}
+
+function grabEnvironments(stack, collaborators) {
+    var headerInfo = [];
+    headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
+    headerInfo.push({ 'key': 'api_key', 'value': stack.api_key });
+    headerInfo.push({ 'key': 'authtoken', 'value': authToken });
+    var request = 'https://api.contentstack.io/v3/environments';
+
+    var resultEnvironments = [];
+    // TODO: make asynchronous calls
+    sendRequest(headerInfo, request, true, function(response) {
+        response.environments.forEach(function(environment) {
+            resultEnvironments.push({ "name": environment.name, "uid": environment.uid, "url": environment.urls[0].url });
+        });
+        stackData.push({ "name": stack.name, "api_key": stack.api_key, "collaborators": collaborators, "environments": resultEnvironments });
+        console.log("DEBUG: Stack data length:  " + stackData.length);
+        console.log("-----> " + stack.name);
+        // return resultEnvironments;
+    });
 }
 
 function getCurrentStackKey(stacks) {
@@ -248,24 +298,6 @@ function getCurrentStackKey(stacks) {
     return stackKey;
 }
 
-function grabEnvironments(stack, data, collaborators) {
-    var headerInfo = [];
-    headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
-    headerInfo.push({ 'key': 'api_key', 'value': stack.api_key });
-    headerInfo.push({ 'key': 'authtoken', 'value': authToken });
-    var request = 'https://api.contentstack.io/v3/environments';
-
-    var resultEnvironments = [];
-    sendRequest(headerInfo, request, false, function(response) {
-        response.environments.forEach(function(environment) {
-            resultEnvironments.push({ "name": environment.name, "uid": environment.uid, "url": environment.urls[0].url });
-        });
-        return resultEnvironments;
-    });
-    data.push({ "name": stack.name, "api_key": stack.api_key, "collaborators": collaborators, "environments": resultEnvironments });
-
-}
-
 function grabCollaborators(collaborators) {
     var result = [];
     collaborators.forEach(function(user) {
@@ -297,7 +329,7 @@ function setHoverEffect(response) {
     hoverHTML.innerHTML = innerText;
 }
 
-function openRevision(editURL) {
+function openRevision() {
     if (editURL !== null) {
         window.open(editURL, "_blank");
     }

@@ -1,7 +1,9 @@
 var authToken = null;
 var currentURL = null;
+var tabArray = [];
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.from && message.from === "menu") {
+        console.log("DEBUG: have authToken: " + authToken);
         switch (message.action) {
             case "login":
                 getUserSession(message.email, message.password, sendResponse);
@@ -32,6 +34,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
                 break;
         }
     }
+    return true;
 });
 
 chrome.browserAction.onClicked.addListener(function(tab) { //Fired when User Clicks ICON
@@ -43,7 +46,10 @@ chrome.browserAction.onClicked.addListener(function(tab) { //Fired when User Cli
 });
 
 function launchMenu() {
-    chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": false } });
+    tabArray.push({ "url": currentURL, "enabled": false });
+    chrome.storage.local.set({ "contentstackTabs": tabArray }, function(response) {
+        console.log("successfully stored tabs: ");
+    });
     chrome.storage.local.get("contentstackLoggedIn", function(response) {
         console.log("user logged in? " + response.contentstackLoggedIn);
     });
@@ -51,6 +57,7 @@ function launchMenu() {
 }
 
 function enableExtension(tabid, sendResponse) {
+    console.log("DEBUG: enabling extension... ");
     chrome.browserAction.setIcon({
         path: {
             "19": "img/badge16.png",
@@ -67,8 +74,20 @@ function enableExtension(tabid, sendResponse) {
     executeScript("scripts/jquery-3.1.1.min.js", tabid, "Injected jquery file ... ");
     executeScript("scripts/scripts.js", tabid, "Script Executed ... ");
 
-    chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": true } });
+    updateTabArray(currentURL, true);
+    //chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": true } });
     sendResponse({ "success": true });
+}
+
+function updateTabArray(url, isEnabled) {
+    for (var index = 0; index < tabArray.length; index++) {
+        if (tabArray[index].url = url) {
+            tabArray[index].enabled = isEnabled;
+        }
+    }
+    chrome.storage.local.set({ "contentstackTabs": tabArray }, function() {
+        console.log("successfully updated tabs: ");
+    });
 }
 
 function executeScript(file, tabid, consoleMessage) {
@@ -93,7 +112,8 @@ function disableExtension(tabid, sendResponse) {
         console.log("Disable: returned from sending suspendScript to script");
     });
 
-    chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": false } });
+    updateTabArray(currentURL, false);
+    //chrome.storage.local.set({ "contentstackTabs": { "url": currentURL, "enabled": false } });
     sendResponse({ "success": true });
 }
 
@@ -122,7 +142,9 @@ function getUserSession(username, password, sendResponse) {
             var resp = JSON.parse(this.responseText);
             if (resp.error_code) {
                 console.log(resp.error_message);
-                chrome.storage.local.set({ 'contentstackLoggedIn': false });
+                chrome.storage.local.set({ 'contentstackLoggedIn': false }, function(response) {
+                    console.log(response);
+                });
                 sendResponse({ "success": false, "error": "Oops: Invalid email/password." });
             } else {
                 authToken = resp.user.authtoken;
@@ -137,13 +159,14 @@ function getUserSession(username, password, sendResponse) {
         }
     });
 
-    xhr.open("POST", "https://api.contentstack.io/v3/user-session", false);
+    xhr.open("POST", "https://api.contentstack.io/v3/user-session", true);
     xhr.setRequestHeader("content-type", "application/json");
     xhr.setRequestHeader("accept", "application/json");
     xhr.send(data);
 }
 
 function signoutUserSession(sendResponse) {
+    console.log("DEBUG:  signing out user");
     if (authToken !== null && authToken !== undefined) {
 
         var xhr = new XMLHttpRequest();
@@ -165,7 +188,7 @@ function signoutUserSession(sendResponse) {
                 });
             }
         });
-        xhr.open("DELETE", "https://api.contentstack.io/v3/user-session", false);
+        xhr.open("DELETE", "https://api.contentstack.io/v3/user-session", true);
         xhr.setRequestHeader("accept", "application/json");
         xhr.setRequestHeader("authtoken", authToken);
         xhr.send();
