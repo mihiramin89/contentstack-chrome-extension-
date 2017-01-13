@@ -4,50 +4,39 @@
 }
 
 .banner {
-    background-color: #E54A4E;
+    background-color: #E6474A;
     width: 100%;
-    height: 70px;
-    box-shadow: 0px 3px 6px #CCCCCC;
+    height: 29px;
+    top: 16px;
+    position: fixed;
+    /*box-shadow: 0px 3px 6px #CCCCCC;*/
 }
 
 .logo {
-    width: 252px;
-    height: 25px;
-    left: 10px;
-    top: 20px;
-    position: absolute;
+    width: 172px;
+    height: 17px;
+    left: 9px;
+    top: 22px;
+    position: fixed;
 }
 
 body {
-    width: 270px;
-    height: 208px;
+    width: 231px;
+    height: 170px;
     margin: 0;
+    background-color: #ECF0F1;
     /*//font-size: 21px;*/
-}
-
-#menu {
-    padding: 20px 62px;
-}
-
-.menuButton {
-    margin-top: 10px;
-    left: 70px;
-    top: 83px;
-}
-
-.menuButton>button {
-    font-size: 15px;
-    background-color: transparent;
-    color: #E54A4E;
-    width: 83.58px;
-    height: 30.78px;
-    border-radius: 10px;
-    border: solid 1px #E54A4E;
 }
 
 #login_screen {
     color: #E54A4E;
-    margin: 6px;
+    margin: 8px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 1px 9px #ccc;
+    padding: 5px;
+    top: 52px;
+    position: absolute;
 }
 
 .buttons {
@@ -57,18 +46,15 @@ body {
 
 button {
     height: 25px;
-    color: #E54A4E;
-    background-color: transparent;
-    border: solid 1px #E54A4E;
-    border-radius: 10px;
-    font-size: 15px;
-}
-
-button#sendcredentials {
-    border-color: transparent;
-    color: white;
-    background-color: #E54A4E;
-    border-radius: 10px;
+    background-color: #25c2a3;
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    font-family: 'proximaNovaRegular', Arial, Helvetica, Sans-Serif;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1.5;
+    outline: 0;
 }
 
 button:focus {
@@ -88,87 +74,6 @@ input[type='password'] {
 input[type='text']:focus,
 input[type='password']:focus {
     outline: none;
-}
-
-.onoffswitch {
-    position: relative;
-    width: 83px;
-    margin-top: 10px;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.onoffswitch-checkbox {
-    display: none;
-}
-
-.onoffswitch-label {
-    display: block;
-    overflow: hidden;
-    cursor: pointer;
-    border: 1px solid #999999;
-    border-radius: 20px;
-}
-
-.onoffswitch-inner {
-    display: block;
-    width: 200%;
-    margin-left: -100%;
-    transition: margin 0.3s ease-in 0s;
-}
-
-.onoffswitch-inner:before,
-.onoffswitch-inner:after {
-    display: block;
-    float: left;
-    width: 50%;
-    height: 26px;
-    padding: 0;
-    line-height: 26px;
-    font-size: 15px;
-    color: white;
-    font-family: Trebuchet, Arial, sans-serif;
-    font-weight: bold;
-    box-sizing: border-box;
-}
-
-.onoffswitch-inner:before {
-    content: "ON";
-    padding-left: 10px;
-    background-color: #E54A4E;
-    color: #FFFFFF;
-}
-
-.onoffswitch-inner:after {
-    content: "OFF";
-    padding-right: 10px;
-    background-color: #EEEEEE;
-    color: #999999;
-    text-align: right;
-}
-
-.onoffswitch-switch {
-    display: block;
-    width: 16px;
-    margin: 6px;
-    background: #FFFFFF;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 50px;
-    border: 1px solid #999999;
-    border-radius: 20px;
-    transition: all 0.3s ease-in 0s;
-}
-
-.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
-    margin-left: 0;
-}
-
-.onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
-    right: 0px;
 }
 
 #message {

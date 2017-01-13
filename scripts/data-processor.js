@@ -52,8 +52,6 @@ function grabEnvironments(stack, collaborators) {
             resultEnvironments.push({ "name": environment.name, "uid": environment.uid, "url": environment.urls[0].url });
         });
         stackData.push({ "name": stack.name, "api_key": stack.api_key, "collaborators": collaborators, "environments": resultEnvironments });
-        console.log("DEBUG: Stack data length:  " + stackData.length);
-        console.log("-----> " + stack.name);
         // return resultEnvironments;
     });
 }

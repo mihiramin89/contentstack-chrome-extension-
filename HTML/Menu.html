@@ -10,39 +10,20 @@
 
 <body>
     <div class="banner">
-        <img class="logo" src="..\img\logo_white.png" alt="Contentstack logo" />
+        <img class="logo" src="..\img\logo_white.svg" alt="Contentstack logo" />
     </div>
     <div id="message"></div>
-    <div id="content">
-        <section id="menu">
-            <div class="menuButton">
-                <button id="login-item">Login</button>
+    <div id="login_screen">
+        <form class="modal-content animate">
+            <div class="container">
+                <input id="username" type="text" placeholder="Enter Email" name="uname" required>
+                <input id="password" type="password" placeholder="Enter Password" name="psw" required>
+                <div class="buttons">
+                    <button type="button" id="sendcredentials">Login</button>
+                </div>
             </div>
-            <div class="onoffswitch">
-                <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" disabled>
-                <label class="onoffswitch-label" for="myonoffswitch">
-                <span class="onoffswitch-inner"></span>
-                <span class="onoffswitch-switch"></span>
-                </label>
-            </div>
-        </section>
-
-        <section id="login_screen" style="display: none;">
-            <form class="modal-content animate">
-                <div class="container">
-                    <label><b>Email</b></label>
-                    <input id="username" type="text" placeholder="Enter Email" name="uname" required>
-
-                    <label><b>Password</b></label>
-                    <input id="password" type="password" placeholder="Enter Password" name="psw" required>
-
-                    <div class="buttons">
-                        <button type="button" id="sendcredentials">Login</button>
-                        <button type="button" id="cancel">Cancel</button>
-                    </div>
-            </form>
-        </section>
-        </div>
+        </form>
+    </div>
 </body>
 
 </html>

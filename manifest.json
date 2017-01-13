@@ -12,15 +12,21 @@
             "48": "img/badgeDis48.png"
         },
         "default_title": "Click to login contentstack",
+        "default_popup": "HTML/Menu.html",
         "name": "Contentstack"
     },
     "background": {
         "scripts": [
             "scripts/background.js"
         ],
-        "persistent": false
+        "persistent": true
     },
-    "permissions": ["activeTab", "tabs", "storage"],
-
-    "web_accessible_resources": ["img/*.svg", "css/styles.css"]
+    "permissions": ["activeTab", "tabs", "storage", "contextMenus", "http://*/", "https://*/"],
+    "icons": {
+        "16": "img/badge48.png",
+        "48": "img/badge515.png",
+        "172": "img/badge172.png",
+        "344": "img/badge344.png"
+    },
+    "web_accessible_resources": ["img/*.svg", "img/*.png", "css/styles.css"]
 }

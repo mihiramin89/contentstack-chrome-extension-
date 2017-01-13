@@ -7,6 +7,7 @@ function init() {
     authToken = null;
     stackData = [];
     storedAllStacks = false;
+    console.log("initializing script");
     var divExists = document.getElementById("contentstack-highlight");
     if (divExists === null) {
         generateHTMLDivs();
@@ -16,40 +17,42 @@ function init() {
         document.body.appendChild(messageDiv);
 
     }
-
-    chrome.runtime.sendMessage({ from: "script", action: "grabAuth" }, function(response) {
-        if (response.success) {
-            authToken = response.token;
-            document.body.onmousemove = startInspection;
-
-            var headerInfo = [];
-            headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
-            headerInfo.push({ 'key': 'authtoken', 'value': authToken });
-
-            var request = 'https://api.contentstack.io/v3/stacks?include_collaborators=true&include_stack_variables=true';
-
-            sendRequest(headerInfo, request, true, stackCallback);
-
-        }
-    });
-
-
-    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-        console.log("receiving message from background");
-        if (message.from && message.from === "background") {
-            switch (message.action) {
-                case "suspendScript":
-                    console.log("suspending script");
-                    suspendInspection();
-                    break;
-            }
-        }
-    });
 }
+
+chrome.runtime.sendMessage({ from: "script", action: "grabAuth" }, function(response) {
+    if (response.success) {
+        authToken = response.token;
+        document.body.onmousemove = startInspection;
+
+        var headerInfo = [];
+        headerInfo.push({ 'key': 'Accept', 'value': 'application/json' });
+        headerInfo.push({ 'key': 'authtoken', 'value': authToken });
+
+        var request = 'https://api.contentstack.io/v3/stacks?include_collaborators=true&include_stack_variables=true';
+
+        sendRequest(headerInfo, request, true, stackCallback);
+
+    } else {
+        console.error(response.error);
+    }
+});
+
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    console.log("receiving message from background");
+    if (message.from && message.from === "background") {
+        switch (message.action) {
+            case "suspendScript":
+                console.log("suspending script");
+                suspendInspection();
+                break;
+        }
+    }
+});
 
 function suspendInspection() {
     if (document.getElementById("contentstack-entryInfo") !== null) {
-        closeHoverBox(arg); //call just to make sure hover box is closed.
+        closeHoverBox(); //call just to make sure hover box is closed.
     }
     var overlay = document.getElementById("contentstack-highlight");
     if (overlay !== null) {
@@ -66,7 +69,7 @@ function startInspection(e) {
         return;
     }
 
-    if (!isInspectionSuspended && authToken) {
+    if (!isInspectionSuspended && authToken !== null) {
         var overlay = document.getElementById("contentstack-highlight");
         var hoverBox = document.getElementById("contentstack-hoverBox");
         if (e.target === cur) {
@@ -105,7 +108,6 @@ function startInspection(e) {
             // request = 'https://api.contentstack.io/v3/content_types/'+entry_id.contentTypeID+'/entries/'+entry_id.entryId;
             request = 'https://api.contentstack.io/v3/content_types/' + entry_id.contentTypeID + '/entries/' + entry_id.entryId;
 
-            //TODO: make asynchronous.
             sendRequest(headerInfo, request, true, function(response) {
                 var entry = response.entry;
                 if (entry !== null && entry !== undefined) {
@@ -117,8 +119,7 @@ function startInspection(e) {
                 }
             });
         } else {
-            console.error("Cannot grab information or not supported by contentstack.");
-            //showMessage("error", "Not a Contentstack generated DOM element or Contentstack website does not support extension. See https://github.com/mihiramin89/contentstack-element-revision-chrome-extension for more information.");
+            console.log("Cannot grab information or not supported by contentstack.");
         }
     }
 }
